@@ -1,6 +1,6 @@
 import { InlineMath, BlockMath } from "react-katex";
 import {
-  LineChart,
+  ComposedChart,
   Line,
   BarChart,
   Bar,
@@ -44,7 +44,9 @@ function ChartRenderer({ jsonStr }: { jsonStr: string }) {
     return <div className="text-destructive text-sm">Invalid chart data</div>;
   }
 
-  // Merge all series into unified data points keyed by x
+  const isBar = data.type === "bar";
+
+  // For bar charts: merge series into a shared categorical array keyed by x
   const allX = new Set<number>();
   for (const s of data.series) {
     for (const pt of s.data) allX.add(pt.x);
@@ -59,8 +61,14 @@ function ChartRenderer({ jsonStr }: { jsonStr: string }) {
     return row;
   });
 
-  const ChartComp = data.type === "bar" ? BarChart : LineChart;
-  const DataComp = data.type === "bar" ? Bar : Line;
+  // For line/scatter: compute x and y domains across all series
+  const allXVals = data.series.flatMap((s) => s.data.map((d) => d.x));
+  const allYVals = data.series.flatMap((s) => s.data.map((d) => d.y));
+  const xMin = Math.min(...allXVals);
+  const xMax = Math.max(...allXVals);
+  const yMin = Math.min(0, Math.min(...allYVals));
+  const yMax = Math.max(...allYVals);
+  const yPad = (yMax - yMin) * 0.08;
 
   return (
     <div className="mt-3 mb-2 rounded-lg border border-border bg-card/60 p-4" data-testid="chart-container">
@@ -70,38 +78,68 @@ function ChartRenderer({ jsonStr }: { jsonStr: string }) {
         </div>
       )}
       <ResponsiveContainer width="100%" height={260}>
-        <ChartComp data={merged} margin={{ top: 4, right: 16, bottom: 24, left: 16 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="hsl(217 25% 20%)" />
-          <XAxis
-            dataKey="x"
-            label={data.xLabel ? { value: data.xLabel, position: "insideBottom", offset: -12, fill: "#8899aa", fontSize: 12 } : undefined}
-            tick={{ fill: "#8899aa", fontSize: 11 }}
-          />
-          <YAxis
-            label={data.yLabel ? { value: data.yLabel, angle: -90, position: "insideLeft", offset: 8, fill: "#8899aa", fontSize: 12 } : undefined}
-            tick={{ fill: "#8899aa", fontSize: 11 }}
-          />
-          <Tooltip
-            contentStyle={{ background: "hsl(220 25% 13%)", border: "1px solid hsl(217 25% 20%)", borderRadius: 6, fontSize: 12 }}
-            labelStyle={{ color: "#ccd6e0" }}
-          />
-          {data.series.length > 1 && <Legend wrapperStyle={{ fontSize: 12, color: "#8899aa" }} />}
-          {data.series.map((s, i) =>
-            data.type === "bar" ? (
+        {isBar ? (
+          <BarChart data={merged} margin={{ top: 4, right: 16, bottom: 24, left: 16 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="hsl(217 25% 20%)" />
+            <XAxis
+              dataKey="x"
+              label={data.xLabel ? { value: data.xLabel, position: "insideBottom", offset: -12, fill: "#8899aa", fontSize: 12 } : undefined}
+              tick={{ fill: "#8899aa", fontSize: 11 }}
+            />
+            <YAxis
+              label={data.yLabel ? { value: data.yLabel, angle: -90, position: "insideLeft", offset: 8, fill: "#8899aa", fontSize: 12 } : undefined}
+              tick={{ fill: "#8899aa", fontSize: 11 }}
+            />
+            <Tooltip
+              contentStyle={{ background: "hsl(220 25% 13%)", border: "1px solid hsl(217 25% 20%)", borderRadius: 6, fontSize: 12 }}
+              labelStyle={{ color: "#ccd6e0" }}
+            />
+            {data.series.length > 1 && <Legend wrapperStyle={{ fontSize: 12, color: "#8899aa" }} />}
+            {data.series.map((s, i) => (
               <Bar key={s.name} dataKey={s.name} fill={CHART_COLORS[i % CHART_COLORS.length]} radius={[3, 3, 0, 0]} />
-            ) : (
+            ))}
+          </BarChart>
+        ) : (
+          // ComposedChart: each Line gets its own data array — no x-merging needed.
+          // This correctly renders trajectories/curves where each series has a different x-range.
+          <ComposedChart margin={{ top: 4, right: 16, bottom: 24, left: 16 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="hsl(217 25% 20%)" />
+            <XAxis
+              type="number"
+              dataKey="x"
+              domain={[xMin, xMax]}
+              label={data.xLabel ? { value: data.xLabel, position: "insideBottom", offset: -12, fill: "#8899aa", fontSize: 12 } : undefined}
+              tick={{ fill: "#8899aa", fontSize: 11 }}
+              tickCount={8}
+            />
+            <YAxis
+              type="number"
+              domain={[yMin, yMax + yPad]}
+              label={data.yLabel ? { value: data.yLabel, angle: -90, position: "insideLeft", offset: 8, fill: "#8899aa", fontSize: 12 } : undefined}
+              tick={{ fill: "#8899aa", fontSize: 11 }}
+            />
+            <Tooltip
+              contentStyle={{ background: "hsl(220 25% 13%)", border: "1px solid hsl(217 25% 20%)", borderRadius: 6, fontSize: 12 }}
+              labelStyle={{ color: "#ccd6e0" }}
+              formatter={(value: number, name: string) => [value.toFixed(2), name]}
+              labelFormatter={(label: number) => `x = ${Number(label).toFixed(2)}`}
+            />
+            {data.series.length > 1 && <Legend wrapperStyle={{ fontSize: 12, color: "#8899aa" }} />}
+            {data.series.map((s, i) => (
               <Line
                 key={s.name}
+                data={s.data}
                 type="monotone"
-                dataKey={s.name}
+                dataKey="y"
+                name={s.name}
                 stroke={CHART_COLORS[i % CHART_COLORS.length]}
                 strokeWidth={2}
                 dot={false}
                 activeDot={{ r: 4 }}
               />
-            )
-          )}
-        </ChartComp>
+            ))}
+          </ComposedChart>
+        )}
       </ResponsiveContainer>
     </div>
   );
