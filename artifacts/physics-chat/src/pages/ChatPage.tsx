@@ -191,15 +191,20 @@ export default function ChatPage() {
     <div className="flex h-full bg-background" data-testid="chat-page">
       {/* Sidebar */}
       <aside className="w-64 flex-shrink-0 flex flex-col border-r border-border bg-sidebar" data-testid="sidebar">
-        <div className="p-4 flex items-center gap-2 border-b border-sidebar-border">
-          <div className="w-7 h-7 rounded-lg bg-primary/20 border border-primary/30 flex items-center justify-center">
+        <button
+          className="p-4 flex items-center gap-2 border-b border-sidebar-border w-full text-left hover:bg-sidebar-accent/50 transition-colors"
+          onClick={() => setActiveConvId(null)}
+          title="Back to home"
+          data-testid="button-home"
+        >
+          <div className="w-7 h-7 rounded-lg bg-primary/20 border border-primary/30 flex items-center justify-center flex-shrink-0">
             <AtomIcon className="w-4 h-4 text-primary" />
           </div>
           <div>
             <div className="text-sm font-semibold text-sidebar-foreground">Medhavy</div>
             <div className="text-xs text-muted-foreground">Physics Engine</div>
           </div>
-        </div>
+        </button>
 
         <div className="p-3">
           <Button
@@ -222,10 +227,13 @@ export default function ChatPage() {
               </div>
             )}
             {[...conversations].reverse().map((conv) => (
-              <button
+              <div
                 key={conv.id}
                 onClick={() => setActiveConvId(conv.id)}
-                className={`w-full text-left px-3 py-2.5 rounded-md group flex items-start gap-2 transition-colors ${
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => e.key === "Enter" && setActiveConvId(conv.id)}
+                className={`w-full text-left px-3 py-2.5 rounded-md group flex items-start gap-2 transition-colors cursor-pointer ${
                   activeConvId === conv.id
                     ? "bg-sidebar-accent text-sidebar-foreground"
                     : "text-muted-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
@@ -247,7 +255,7 @@ export default function ChatPage() {
                 >
                   <Trash2Icon className="w-3 h-3" />
                 </button>
-              </button>
+              </div>
             ))}
           </div>
         </ScrollArea>
