@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "Medhavy Physics Chat"
+version = "1.0.0"
+id = "artifacts/physics-chat"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 23036
+
+[services.development]
+run = "pnpm --filter @workspace/physics-chat run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/physics-chat", "run", "build" ]
+publicDir = "artifacts/physics-chat/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "23036"
+BASE_PATH = "/"

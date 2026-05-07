@@ -1,0 +1,450 @@
+Interactive Chat Track — Comprehensive Project Writeup
+1. Purpose of the Interactive Chat Track
+
+The Interactive Chat Track is the real-time computational layer of the Medhavy Physics Engine.
+
+Its purpose is to allow students using the OpenStax University Physics Volume 1 textbook to interactively explore physics concepts through:
+
+computations
+symbolic solving
+graphs
+parameter experimentation
+lightweight simulations
+guided explanations
+
+This component should function inside the textbook chat interface and support rapid educational interaction.
+
+Unlike the offline animation pipeline, this system prioritizes:
+
+responsiveness
+interactivity
+conceptual understanding
+exploration
+
+The system is intended to act as a computational and visualization assistant rather than a heavy-duty scientific simulation platform.
+
+2. Educational Objective
+
+The primary educational objective is:
+
+Help students build intuition for physics concepts through interactive experimentation.
+
+Traditional textbooks are static:
+
+equations are fixed
+figures are fixed
+examples are fixed
+
+The Interactive Chat Track introduces dynamic learning where students can:
+
+modify parameters
+test scenarios
+visualize outcomes
+observe relationships in real time
+
+Example:
+A student learning projectile motion should be able to:
+
+change launch angle
+modify velocity
+vary gravity
+instantly observe trajectory changes
+
+The goal is to support:
+
+conceptual learning
+intuition development
+exploratory reasoning
+visual reinforcement
+3. Core System Philosophy
+
+The system should be:
+
+Lightweight
+
+Avoid computationally expensive simulations.
+
+Focus on:
+
+educational usefulness
+responsiveness
+simplicity
+Interactive
+
+Students should receive outputs quickly enough to support conversational learning.
+
+Target:
+
+seconds, not minutes
+Explainable
+
+Outputs should not be “black box” results.
+
+The system should generate:
+
+equations
+plots
+explanations
+intermediate reasoning where appropriate
+Safe
+
+LLM-generated code execution must occur inside controlled environments.
+
+Modular
+
+The system should support multiple physics topics without rewriting infrastructure.
+
+4. High-Level Workflow
+Step 1 — Student Input
+
+Student interacts with textbook chat interface.
+
+Possible inputs:
+
+conceptual questions
+computational requests
+visualization requests
+parameter modifications
+
+Examples:
+
+“Plot projectile trajectory for 30°, 45°, and 60°”
+“Solve this spring oscillation equation”
+“Show how angular velocity changes with radius”
+“What happens if friction increases?”
+“Visualize wave interference”
+Step 2 — Query Interpretation
+
+LLM interprets:
+
+intent
+physics topic
+required operation
+output type
+
+Possible categories:
+
+symbolic solving
+numerical computation
+plotting
+simulation
+explanation generation
+Step 3 — Physics Code Generation
+
+LLM generates Python code using approved libraries.
+
+Possible outputs:
+
+SymPy expressions
+NumPy calculations
+SciPy integrations
+Matplotlib/Plotly visualizations
+
+The generated code should:
+
+be deterministic
+follow formatting conventions
+remain sandbox-compatible
+Step 4 — Static Validation Layer
+
+Before execution:
+
+parse AST
+validate imports
+block dangerous operations
+
+Disallow:
+
+filesystem access
+shell execution
+networking
+subprocesses
+arbitrary imports
+
+Allow only approved libraries.
+
+Step 5 — Secure Execution
+
+Code executes inside:
+
+container
+sandbox
+isolated runtime
+
+Possible infrastructure:
+
+AWS Lambda
+ECS Fargate
+containerized Python executor
+
+Execution should enforce:
+
+timeout limits
+memory limits
+CPU limits
+Step 6 — Result Processing
+
+System collects:
+
+numerical outputs
+plots
+generated equations
+scientific notation formatting
+unit formatting
+
+Artifacts generated:
+
+PNG/SVG plots
+JSON outputs
+LaTeX equations
+Step 7 — Tutor Response Rendering
+
+Results displayed in textbook UI.
+
+Possible outputs:
+
+graph
+explanation
+equation derivation
+interactive parameter sliders
+highlighted conceptual interpretation
+5. Supported Interaction Types
+A. Symbolic Mathematics
+
+Purpose:
+Solve algebraic and calculus-based physics equations symbolically.
+
+Tools:
+
+SymPy
+
+Examples:
+
+Newton’s laws
+kinematic equations
+derivatives/integrals
+differential equations
+
+Outputs:
+
+symbolic solution
+step-by-step derivation
+LaTeX equations
+B. Numerical Computation
+
+Purpose:
+Compute numerical answers.
+
+Tools:
+
+NumPy
+SciPy
+
+Examples:
+
+projectile range
+energy calculations
+numerical integration
+approximation methods
+
+Outputs:
+
+computed values
+tables
+scientific notation
+C. Plotting and Graphs
+
+Purpose:
+Visualize relationships.
+
+Tools:
+
+Matplotlib
+Plotly
+
+Examples:
+
+position vs time
+electric field curves
+harmonic motion
+wave propagation
+
+Outputs:
+
+static graphs
+interactive graphs
+D. Lightweight Simulations
+
+Purpose:
+Allow students to experiment with parameters dynamically.
+
+Examples:
+
+pendulum behavior
+spring oscillation
+wave interference
+motion under gravity
+
+These should remain computationally lightweight.
+
+6. Physics Domains (Initial Scope)
+
+The current textbook focus is:
+
+OpenStax University Physics Volume 1
+
+Main topics:
+
+mechanics
+oscillations
+waves
+
+Initial concepts:
+
+projectile motion
+circular motion
+conservation laws
+collisions
+harmonic oscillators
+wave propagation
+7. User Experience Goals
+
+The system should feel:
+
+conversational
+educational
+exploratory
+
+Students should feel comfortable experimenting.
+
+Good UX examples:
+
+adjustable sliders
+instant graph updates
+comparative visualizations
+intuitive labels
+8. LLM Responsibilities
+
+The LLM is not merely a chatbot.
+
+It should:
+
+interpret educational intent
+select computational strategy
+generate executable code
+produce explanations
+standardize outputs
+
+Potential future role:
+
+recommend visualizations automatically from textbook sections
+9. Tooling Stack
+Symbolic Math
+SymPy
+Numerical Computation
+NumPy
+SciPy
+Visualization
+Matplotlib
+Plotly
+Units
+Pint
+Backend
+Python executor
+container runtime
+AI Layer
+Claude/GPT/Gemini/etc.
+10. Infrastructure Requirements
+Lightweight Compute
+
+Interactive tasks should complete quickly.
+
+Target:
+
+low latency
+low compute cost
+Sandbox Security
+
+Critical because:
+
+LLM generates executable Python
+
+Need:
+
+isolated execution
+resource constraints
+import allowlists
+Artifact Storage
+
+Store:
+
+generated graphs
+cached outputs
+reusable computations
+
+Possible tools:
+
+S3
+Redis
+11. Evaluation Criteria
+
+The system should be evaluated on:
+
+Educational Clarity
+
+Does the output improve understanding?
+
+Correctness
+
+Are equations and plots accurate?
+
+Responsiveness
+
+Does interaction remain fast?
+
+Visual Quality
+
+Are outputs intuitive and readable?
+
+Stability
+
+Does generated code execute reliably?
+
+12. MVP Recommendation
+Suggested First Chapter
+
+Projectile motion or oscillations.
+
+Why:
+
+visually intuitive
+computationally lightweight
+easy parameter experimentation
+MVP Features
+Must Have
+equation solving
+plotting
+parameter control
+simple simulation
+Nice to Have
+interactive sliders
+multi-plot comparison
+explanation generation
+13. What This System Is NOT
+
+The Interactive Chat Track is NOT:
+
+a full HPC physics simulator
+a replacement for COMSOL/MATLAB
+a heavy numerical PDE engine
+a full research-grade computational physics system
+
+Its purpose is:
+
+educational interactivity and intuition building
+
+14. Final Definition
+
+The Interactive Chat Track is:
+
+A lightweight, LLM-assisted educational computation and visualization layer integrated into the OpenStax textbook platform, enabling students to interactively explore physics concepts through symbolic solving, plotting, simulations, and guided explanations in real time.
