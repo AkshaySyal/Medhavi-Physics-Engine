@@ -4,6 +4,8 @@ An LLM-powered interactive physics tutoring chat interface integrated with the O
 
 **Live app**: [interactive-chat-track.replit.app](https://interactive-chat-track.replit.app/)
 
+**Demo**: [Watch demo](https://drive.google.com/file/d/1eT0luFxalkv6caNbJMgiT25vfqznzpqD/view?usp=sharing)
+
 ## Run & Operate
 
 - `pnpm --filter @workspace/api-server run dev` — run the API server (port 8080)
