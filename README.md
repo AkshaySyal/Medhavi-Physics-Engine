@@ -2,6 +2,8 @@
 
 An LLM-powered interactive physics tutoring chat interface integrated with the OpenStax University Physics Volume 1 textbook. Students can ask questions, run computations, generate plots, and explore physics concepts in real time.
 
+**Live app**: [interactive-chat-track.replit.app](https://interactive-chat-track.replit.app/)
+
 ## Run & Operate
 
 - `pnpm --filter @workspace/api-server run dev` — run the API server (port 8080)
