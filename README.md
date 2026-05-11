@@ -5,6 +5,7 @@ An LLM-powered interactive physics tutoring chat interface integrated with the O
 **Live app**: [interactive-chat-track.replit.app](https://interactive-chat-track.replit.app/)
 
 **Demo**: [![Demo](demo-thumbnail.png)](https://drive.google.com/file/d/1eT0luFxalkv6caNbJMgiT25vfqznzpqD/view?usp=sharing)
+[Watch demo →](https://drive.google.com/file/d/1eT0luFxalkv6caNbJMgiT25vfqznzpqD/view?usp=sharing)
 
 ## Run & Operate
 
